@@ -1,0 +1,5 @@
+li.input-error{    list-style: none;    height: 20px;    line-height: 30px;    margin-left: 10px;    color: red;    font-weight: bold;    font-family: helvetica;    font-size: 13px;}.sombra-lyrics a{    color: rgb(144, 144, 144);    font-size: 20px;    text-align: center;    text-shadow: rgb(187, 187, 187) 0.1em 0.1em 0.2em;}.sombra-lyrics a:hover{    color: #5E5E5E;}/*|| Extensiones para bootstrap 3.0| ----------------------------------------------------|*/.input-group .form-control {    z-index: auto !important;}/*FONDO LOGIN*/.logo-fitness {    width: 256px;}.has-feedback .form-control {    padding-right: 0px !important;}.pagination>.active>a{    background-color: #626262;}.pagination>.active>a:hover{     background-color: #363636;}
+
+.activado{
+   color: red;
+}
