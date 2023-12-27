@@ -473,7 +473,7 @@ export const HeaderTwo = (): JSX.Element => {
                             : defaultperfil
                         }
                         alt=""
-                        className="rounded-full w-16 h-16"
+                        className="rounded-full w-16 h-16 object-cover"
                       />
 
                       <AnimatePresence>
@@ -509,7 +509,7 @@ export const HeaderTwo = (): JSX.Element => {
                                         : defaultperfil
                                     }
                                     alt=""
-                                    className="rounded-full"
+                                    className="rounded-full h-full w-full object-cover"
                                   />
                                 </span>
                               </div>

@@ -152,7 +152,7 @@ export const Perfil = (): JSX.Element | undefined => {
                     : defaultperfil
                 }
                 alt=""
-                className="w-96 h-96 -top-52 relative rounded-full drop-shadow-xl"
+                className="w-96 h-96 -top-52 relative rounded-full drop-shadow-xl object-cover"
               />
                 )
               : (

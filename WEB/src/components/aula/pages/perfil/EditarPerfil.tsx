@@ -319,7 +319,7 @@ export const EditarPerfil = (): JSX.Element => {
                           : defaultperfil
                       }
                       alt=""
-                      className="w-full h-full object-cover bg-center"
+                      className="w-full h-full object-cover"
                     />
                       )
                     : (
