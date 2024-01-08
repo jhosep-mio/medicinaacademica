@@ -75,6 +75,9 @@ export const CentroAyuda = (): JSX.Element => {
           <h2>Centro de ayuda</h2>
         </div>
         <div className="politicas__info">
+        <h2 className="text-5xl mb-6 pl-3 text-primary font-bold mt-10">
+            Generales
+          </h2>
           <Accordion
             expanded={expanded === 'panel1'}
             onChange={handleChange('panel1')}
@@ -411,7 +414,7 @@ export const CentroAyuda = (): JSX.Element => {
           </Accordion>
         </div>
 
-        <div className="politicas__info">
+        {/* <div className="politicas__info">
           <h2 className="text-5xl mb-6 pl-3 text-primary font-bold mt-10">
             Generales
           </h2>
@@ -540,7 +543,7 @@ export const CentroAyuda = (): JSX.Element => {
               </p>
             </AccordionDetails>
           </Accordion>
-        </div>
+        </div> */}
       </section>
 
       <FooterTwo />

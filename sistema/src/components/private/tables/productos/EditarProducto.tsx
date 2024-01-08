@@ -297,20 +297,20 @@ export const EditarProducto = (): JSX.Element => {
   const eliminarItemDeClase = (claseIndex: number, itemIndex: number): void => {
     const nuevasClases = clases.map((clase, i) => {
       if (i === claseIndex) {
-        const nuevoContenido = clase.contenido.filter(
-          (_, j) => j !== itemIndex
-        )
+        const nuevoContenido = [...clase.contenido]
+        nuevoContenido.splice(itemIndex, 1)
         return {
           ...clase,
           contenido: nuevoContenido,
-          tiemposClase: nuevoContenido,
-          linkClases: nuevoContenido,
-          codClases: nuevoContenido,
-          tipos: nuevoContenido
+          tiemposClase: clase.tiemposClase?.filter((_, j) => j !== itemIndex),
+          linkClases: clase.linkClases?.filter((_, j) => j !== itemIndex),
+          codClases: clase.codClases?.filter((_, j) => j !== itemIndex),
+          tipos: clase.tipos?.filter((_, j) => j !== itemIndex)
         }
       }
       return clase
     })
+
     setClases(nuevasClases)
   }
 

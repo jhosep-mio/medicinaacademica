@@ -57,7 +57,7 @@ export const CursoCard = ({
           <span className="text-[1.7rem] relative text-black/70">
             Precio en dolares{' '}
             <span className="font-bold">
-              $USD {(producto.precio2 / Number(data.dolar)).toFixed(2)}
+              $USD {(producto.precio2 / Number(data.dolar)).toFixed(1)}
             </span>
           </span>
         </div>
@@ -82,7 +82,7 @@ export const CursoCard = ({
           <span className="text-[1.7rem] relative text-black/70">
             Precio en dolares{' '}
             <span className="font-bold">
-              $USD {(producto.precio2 / Number(data.dolar)).toFixed(2)}
+              $USD {(producto.precio2 / Number(data.dolar)).toFixed(1)}
             </span>
           </span>
         </div>

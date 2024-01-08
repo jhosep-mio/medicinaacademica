@@ -11,7 +11,7 @@ import { InputsBriefs } from '../../../shared/InputsBriefs'
 import { Errors } from '../../../shared/Errors'
 import {
   type ImagenState,
-  serviciosValuesModificate,
+  type serviciosValuesModificate
 } from '../../../shared/Interfaces'
 import { SchemaServicios } from '../../../shared/Schemas'
 import Editor from '../../../shared/Editar'
@@ -39,7 +39,6 @@ export const EditarServicios = (): JSX.Element => {
   const [boton1, setBoton1] = useState(false)
   const [url1, setUrl1] = useState('')
 
-
   const [imagen2, setImagen2] = useState('')
   const [imagenNueva2, setImagenNueva2] = useState<ImagenState>({
     archivo: null,
@@ -48,8 +47,6 @@ export const EditarServicios = (): JSX.Element => {
 
   const [boton2, setBoton2] = useState(false)
   const [url2, setUrl2] = useState('')
-
-
 
   useEffect(() => {
     setLoadingComponents(true)
@@ -68,6 +65,8 @@ export const EditarServicios = (): JSX.Element => {
     data.append('nombre', values.nombre)
     data.append('caracteristicas', content)
     data.append('titulo1', values.titulo1)
+    data.append('titulo2', values.titulo2)
+    data.append('contenido2', values.contenido2)
     data.append('seccion1', seccion1)
     data.append('seccion2', seccion2)
     data.append('seccion3', seccion3)
@@ -80,7 +79,6 @@ export const EditarServicios = (): JSX.Element => {
       data.append('imagen2', imagenNueva2.archivo)
     }
 
-   
     data.append('_method', 'PUT')
 
     try {
@@ -120,7 +118,9 @@ export const EditarServicios = (): JSX.Element => {
     setValues({
       ...values,
       nombre: request.data[0].nombre,
-      titulo1: request.data[0].titulo1
+      titulo1: request.data[0].titulo1,
+      titulo2: request.data[0].titulo2,
+      contenido2: request.data[0].contenido2
     })
     setImagen1(request.data[0].imagen1)
     setImagen2(request.data[0].imagen2)
@@ -129,8 +129,6 @@ export const EditarServicios = (): JSX.Element => {
     setSeccion2(request.data[0].seccion2)
     setSeccion3(request.data[0].seccion3)
     setSeccion4(request.data[0].seccion4)
-
-
   }
 
   const {
@@ -145,7 +143,9 @@ export const EditarServicios = (): JSX.Element => {
   } = useFormik({
     initialValues: {
       nombre: '',
-      titulo1: ''
+      titulo1: '',
+      titulo2: '',
+      contenido2: ''
     },
     validationSchema: SchemaServicios,
     onSubmit: updateProducto
@@ -184,9 +184,8 @@ export const EditarServicios = (): JSX.Element => {
               />
               <Errors errors={errors.nombre} touched={touched.nombre} />
             </div>
-           
           </div>
-       
+
           <div className="flex flex-col md:flex-row md:items-center gap-y-2 mb-10 relative">
             <p className="bg-secondary-100 pt-0 pb-0 lg:pl-2  mr-0 mb-0 font-medium text-white text-md lg:absolute py-2 rounded-md top-[-10px]">
               Imagen del servicio<span className="text-red-500">*</span>
@@ -212,7 +211,6 @@ export const EditarServicios = (): JSX.Element => {
                 setImagen={setImagenNueva2}
                 clase="2"
               />
-        
             </div>
           </div>
 
@@ -226,15 +224,15 @@ export const EditarServicios = (): JSX.Element => {
           </div>
 
           <div className="w-full lg:w-full mb-12">
-              <TitleBriefs titulo="Título de la sección 1" />
-              <InputsBriefs
-                name="titulo1"
-                type="text"
-                value={values.titulo1}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
-              <Errors errors={errors.titulo1} touched={touched.titulo1} />
+            <TitleBriefs titulo="Título de la sección 1" />
+            <InputsBriefs
+              name="titulo1"
+              type="text"
+              value={values.titulo1}
+              onChange={handleChange}
+              onBlur={handleBlur}
+            />
+            <Errors errors={errors.titulo1} touched={touched.titulo1} />
           </div>
 
           <div className="flex flex-col md:flex-row md:items-center gap-y-2 mb-20 relative">
@@ -270,6 +268,36 @@ export const EditarServicios = (): JSX.Element => {
             </p>
             <div className="flex-1 w-full md:w-3/4">
               <Editor content={seccion4} setContent={setSeccion4} />
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row md:items-center gap-y-2 mb-20 mt-3 relative">
+            <p className="bg-transparent pt-0 pb-0 lg:pl-2  mr-0 mb-0 font-medium text-white text-md lg:absolute py-2 rounded-md top-[-25px]">
+              Seccion contacto
+            </p>
+            <div className="flex-1 w-full md:w-3/4">
+              <div className="w-full lg:w-full mt-6">
+                <TitleBriefs titulo="Titulo" />
+                <InputsBriefs
+                  name="titulo2"
+                  type="text"
+                  value={values.titulo2}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                />
+                <Errors errors={errors.titulo2} touched={touched.titulo2} />
+              </div>
+              <div className="w-full lg:w-full mt-6">
+                <TitleBriefs titulo="Descripcion" />
+                <InputsBriefs
+                  name="contenido2"
+                  type="text"
+                  value={values.contenido2}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                />
+                <Errors errors={errors.contenido2} touched={touched.contenido2} />
+              </div>
             </div>
           </div>
 

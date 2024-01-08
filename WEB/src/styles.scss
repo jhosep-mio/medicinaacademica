@@ -3504,7 +3504,6 @@ aside {
 .resenas {
   padding: 50px 80px;
   //   padding-top: 0;
-
   &__title {
     padding-bottom: 70px;
     h2 {
@@ -5399,6 +5398,7 @@ aside {
   img {
     width: 100%;
     object-fit: cover;
+    max-height: 500px;
   }
 }
 
@@ -5767,6 +5767,16 @@ aside {
 }
 
 @media (max-width: 576px) {
+    .btn_frmcontact {
+        width: fit-content !important;
+    }
+    .cardResenas {
+        width: 100%;
+    }
+
+    .resenas__title {
+        padding-bottom: 20px;
+    }
   .fondo_screen2 {
     height: 100% !important;
   }

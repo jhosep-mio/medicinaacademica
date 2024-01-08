@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { Swiper, SwiperSlide } from 'swiper/react'
-
+import { Autoplay } from 'swiper'
 import 'swiper/css'
 import 'swiper/css/effect-fade'
 import 'swiper/css/grid'
@@ -102,6 +102,7 @@ const ViewServicio = (): JSX.Element => {
       `${Global.url}/testimoniosFrom/${id ?? ''}`
     )
     setTestimonios(request.data)
+    console.log(request.data)
   }
 
   useEffect(() => {
@@ -180,23 +181,6 @@ const ViewServicio = (): JSX.Element => {
           </div>
 
           <div className="viewServicio__seccion1__info">
-            {/* <div className="">
-                        <h5>Programa de consultorías en Investigación</h5>
-                        <ul>
-                            <li>Asesoría de tesis nivel pregrado </li>
-                            <li>Solicita un asesor de Medicina Académica para avanzar en tu tesis de pregrado y culminar el proceso en pocos meses </li>
-                        </ul>
-                    </div>
-                    <div className="">
-                        <h5>Servicios</h5>
-                        <ul>
-                            <li>Planteamiento de preguntas/hipótesis en investigación </li>
-                            <li>Diseño y recolección de datos </li>
-                            <li>Redacción científica </li>
-                            <li>Análisis bioestadístico de datos </li>
-                            <li>Publicación científica </li>
-                        </ul>
-                    </div> */}
             <div
               className="contentM"
               dangerouslySetInnerHTML={{ __html: servicio.seccion1 }}
@@ -259,17 +243,22 @@ const ViewServicio = (): JSX.Element => {
         </div>
 
         <section
-          className="resenas resenas2"
-          style={{ padding: '10px 160px 50px 160px', marginTop: '160px' }}
+          className="resenas resenas mt-[160px]"
+        //   style={{ padding: '10px 160px 50px 160px', marginTop: '160px' }}
         >
           <div className="resenas__title">
-            <h2>Testimoniosy casos de éxito</h2>
+            <h2>Testimonios y casos de éxito</h2>
           </div>
           <div className="resenas__main">
             <Swiper
               slidesPerView={3}
               loop={true}
               spaceBetween={30}
+              modules={[Autoplay]}
+              autoplay={{
+                delay: 3000,
+                disableOnInteraction: false
+              }}
               className="swp_testimonios"
               breakpoints={{
                 0: {
@@ -289,7 +278,7 @@ const ViewServicio = (): JSX.Element => {
               }}
             >
               {testimonios.map((testimonio: testimoniosValues) => (
-                <SwiperSlide key={testimonio.id}>
+                <SwiperSlide key={testimonio.id} className='my-auto'>
                   <div className="cardResenas">
                     <div className="cardResenas__img">
                       <img
@@ -357,10 +346,15 @@ const ViewServicio = (): JSX.Element => {
         <div className="viewServicio__seccion6">
           <div className="viewServicio__seccion6__main">
             <div className="viewServicio__seccion6__main__item">
-              <h3>Garantía de Satisfacción</h3>
+              <h3>{
+               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+               // @ts-expect-error
+              servicio.titulo2}</h3>
               <p>
-                Destacar cualquier garantía o política de reembolso si es
-                aplicable
+               {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+               // @ts-expect-error
+               servicio.contenido2}
               </p>
             </div>
             <div className="viewServicio__seccion6__main__item">

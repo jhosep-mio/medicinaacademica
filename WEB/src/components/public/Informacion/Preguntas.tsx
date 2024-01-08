@@ -266,12 +266,6 @@ const Preguntas = (): JSX.Element => {
               <p className='mt-10'>¡Atrévete a potenciar tu carrera! Estoy emocionado/a de tenerte en nuestras clases.</p>
             </AccordionDetails>
           </Accordion>
-        </div>
-
-        <div className="politicas__info">
-          <h2 className="text-5xl mb-6 pl-3 text-primary font-bold mt-10">
-            Generales
-          </h2>
           <Accordion
             expanded={expanded === 'panel110'}
             onChange={handleChange('panel110')}
@@ -280,7 +274,7 @@ const Preguntas = (): JSX.Element => {
               aria-controls="panel110d-content"
               id="panel110d-header"
             >
-              <Typography>1. ¿Quiénes somos?</Typography>
+              <Typography>6. ¿Quiénes somos?</Typography>
             </AccordionSummary>
             <AccordionDetails>
               <p>
@@ -304,7 +298,7 @@ const Preguntas = (): JSX.Element => {
               id="panel112d-header"
             >
               <Typography>
-                1. ¿El acceso a los cursos es para siempre?
+                7. ¿El acceso a los cursos es para siempre?
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
@@ -325,7 +319,7 @@ const Preguntas = (): JSX.Element => {
               aria-controls="panel113d-content"
               id="panel113d-header"
             >
-              <Typography>3. ¿Tienen política de reembolso?</Typography>
+              <Typography>8. ¿Tienen política de reembolso?</Typography>
             </AccordionSummary>
             <AccordionDetails>
               <p>
@@ -347,7 +341,7 @@ const Preguntas = (): JSX.Element => {
               id="panel114d-header"
             >
               <Typography>
-                4. ¿Cómo se genera el certificado y a nombre de quién es el
+                9. ¿Cómo se genera el certificado y a nombre de quién es el
                 certificado?
               </Typography>
             </AccordionSummary>
@@ -380,7 +374,7 @@ const Preguntas = (): JSX.Element => {
               id="panel15d-header"
             >
               <Typography>
-                5. ¿Cuál es la diferencia entre un curso asincrónico y
+                10. ¿Cuál es la diferencia entre un curso asincrónico y
                 sincrónico?
               </Typography>
             </AccordionSummary>
@@ -398,6 +392,13 @@ const Preguntas = (): JSX.Element => {
             </AccordionDetails>
           </Accordion>
         </div>
+
+        {/* <div className="politicas__info">
+          <h2 className="text-5xl mb-6 pl-3 text-primary font-bold mt-10">
+            Generales
+          </h2>
+
+        </div> */}
       </section>
     </>
   )

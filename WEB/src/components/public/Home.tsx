@@ -1,5 +1,5 @@
 import { Swiper, SwiperSlide } from 'swiper/react'
-
+import { Autoplay } from 'swiper'
 import 'swiper/css'
 import 'swiper/css/effect-fade'
 import 'swiper/css/grid'
@@ -168,6 +168,11 @@ const Home = (): JSX.Element => {
             spaceBetween={30}
             className="swp_testimonios"
             draggable={false}
+            modules={[Autoplay]}
+            autoplay={{
+              delay: 3000,
+              disableOnInteraction: false
+            }}
             breakpoints={{
               0: {
                 slidesPerView: 1,

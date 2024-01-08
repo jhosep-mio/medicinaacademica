@@ -1,83 +1,85 @@
-import { useState } from 'react'
+import { useState } from "react";
 
-import { Link, useNavigate } from 'react-router-dom'
-import useAuth from '../../../hooks/useAuth'
+import { Link, useNavigate } from "react-router-dom";
+import useAuth from "../../../hooks/useAuth";
 // Icons
 import {
   RiLogoutCircleRLine,
   RiMenu3Line,
   RiCloseLine,
   RiStackFill,
-  RiArrowRightSLine
-} from 'react-icons/ri'
+  RiArrowRightSLine,
+} from "react-icons/ri";
 
-import axios from 'axios'
-import { Global } from '../../../helper/Global'
+import axios from "axios";
+import { Global } from "../../../helper/Global";
 
-import { logo_white } from '../../shared/Images'
+import { logo_white } from "../../shared/Images";
 
 const SideBar = (): JSX.Element => {
-  const { auth, setAuth, setLoading } = useAuth()
-  const token = localStorage.getItem('token')
-  const tokenProfesor = localStorage.getItem('tokenProfesor')
-  const [showMenu, setShowMenu] = useState(false)
-  const navigate = useNavigate()
-  const [showSubmenu3, setShowSubmenu3] = useState(false)
-  const [activeItem, setActiveItem] = useState(0)
+  const { auth, setAuth, setLoading } = useAuth();
+  const token = localStorage.getItem("token");
+  const tokenProfesor = localStorage.getItem("tokenProfesor");
+  const [showMenu, setShowMenu] = useState(false);
+  const navigate = useNavigate();
+  const [showSubmenu3, setShowSubmenu3] = useState(false);
+  const [activeItem, setActiveItem] = useState(0);
 
   const cerrarSession = async (): Promise<void> => {
-    setLoading(true)
-    const data = new FormData()
-    data.append('_method', 'POST')
+    setLoading(true);
+    const data = new FormData();
+    data.append("_method", "POST");
 
     await axios.post(`${Global.url}/logout`, data, {
       headers: {
-        Authorization: `Bearer ${token !== null && token !== '' ? token : ''}`
-      }
-    })
-    localStorage.clear()
+        Authorization: `Bearer ${token !== null && token !== "" ? token : ""}`,
+      },
+    });
+    localStorage.clear();
     setAuth({
-      id: '',
-      name: '',
-      email: '',
+      id: "",
+      name: "",
+      email: "",
       idRol: null,
-      foto: ''
-    })
-    navigate('/login')
-    setLoading(false)
-  }
+      foto: "",
+    });
+    navigate("/login");
+    setLoading(false);
+  };
 
   const cerrarSessionProfesor = async (): Promise<void> => {
-    setLoading(true)
-    const data = new FormData()
-    data.append('_method', 'POST')
+    setLoading(true);
+    const data = new FormData();
+    data.append("_method", "POST");
 
     await axios.post(`${Global.url}/logout`, data, {
       headers: {
-        Authorization: `Bearer ${tokenProfesor !== null && tokenProfesor !== '' ? tokenProfesor : ''}`
-      }
-    })
-    localStorage.clear()
+        Authorization: `Bearer ${
+          tokenProfesor !== null && tokenProfesor !== "" ? tokenProfesor : ""
+        }`,
+      },
+    });
+    localStorage.clear();
     setAuth({
-      id: '',
-      name: '',
-      email: '',
+      id: "",
+      name: "",
+      email: "",
       idRol: null,
-      foto: ''
-    })
-    navigate('/login')
-    setLoading(false)
-  }
+      foto: "",
+    });
+    navigate("/login");
+    setLoading(false);
+  };
 
   const handleItemClick = (itemId: number): void => {
-    setActiveItem(itemId)
-  }
+    setActiveItem(itemId);
+  };
 
   return (
     <>
       <div
         className={`fixed xl:static w-[80%] md:w-[40%] lg:w-[30%] xl:w-auto h-full top-0 bg-primary shadow-xl p-4 flex flex-col justify-between z-50 ${
-          showMenu ? 'left-0' : '-left-full'
+          showMenu ? "left-0" : "-left-full"
         } transition-all`}
       >
         <div>
@@ -124,7 +126,7 @@ const SideBar = (): JSX.Element => {
                 <li>
                   <button
                     onClick={() => {
-                      setShowSubmenu3(!showSubmenu3)
+                      setShowSubmenu3(!showSubmenu3);
                     }}
                     className="w-full flex items-center justify-between py-2 px-4 rounded-lg hover:bg-secondary-900 transition-colors"
                   >
@@ -133,14 +135,14 @@ const SideBar = (): JSX.Element => {
                     </span>
                     <RiArrowRightSLine
                       className={`mt-1 ${
-                        showSubmenu3 ? 'rotate-90' : ''
+                        showSubmenu3 ? "rotate-90" : ""
                       } transition-all`}
                     />
                   </button>
 
                   <ul
                     className={` ${
-                      showSubmenu3 ? 'h-[100px]' : 'h-0'
+                      showSubmenu3 ? "h-[100px]" : "h-0"
                     } overflow-y-hidden transition-all`}
                   >
                     <li>
@@ -148,11 +150,11 @@ const SideBar = (): JSX.Element => {
                         to="productos"
                         className={`py-2 px-4 border-l border-gray-500 ml-6 block relative before:w-3 before:h-3 before:absolute ${
                           activeItem == 4
-                            ? 'before:bg-main'
-                            : 'before:bg-gray-500'
+                            ? "before:bg-main"
+                            : "before:bg-gray-500"
                         } before:rounded-full before:-left-[6.5px] before:top-1/2 before:-translate-y-1/2 before:border-4 before:border-secondary-100 hover:text-white transition-colors`}
                         onClick={() => {
-                          handleItemClick(4)
+                          handleItemClick(4);
                         }}
                       >
                         Productos
@@ -161,11 +163,11 @@ const SideBar = (): JSX.Element => {
                         to="examenes"
                         className={`py-2 px-4 border-l border-gray-500 ml-6 block relative before:w-3 before:h-3 before:absolute ${
                           activeItem == 99
-                            ? 'before:bg-main'
-                            : 'before:bg-gray-500'
+                            ? "before:bg-main"
+                            : "before:bg-gray-500"
                         } before:rounded-full before:-left-[6.5px] before:top-1/2 before:-translate-y-1/2 before:border-4 before:border-secondary-100 hover:text-white transition-colors`}
                         onClick={() => {
-                          handleItemClick(99)
+                          handleItemClick(99);
                         }}
                       >
                         Examenes
@@ -191,6 +193,14 @@ const SideBar = (): JSX.Element => {
                 </li>
                 <li>
                   <Link
+                    to="cupones"
+                    className="flex items-center gap-4 py-2 px-4 rounded-lg text-white hover:bg-secondary-900 transition-colors"
+                  >
+                    <RiStackFill className="text-main" /> Cupones
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     to="transacciones"
                     className="flex items-center gap-4 py-2 px-4 rounded-lg text-white hover:bg-secondary-900 transition-colors"
                   >
@@ -208,37 +218,39 @@ const SideBar = (): JSX.Element => {
               </>
             )}
             {auth.idRol == 98 && (
-                <>
+              <>
                 <li>
-                    <Link to='cursos'
+                  <Link
+                    to="cursos"
                     className="w-full flex items-center justify-between py-2 px-4 rounded-lg hover:bg-secondary-900 transition-colors"
-                    >
+                  >
                     <span className="flex items-center gap-4">
-                        <RiStackFill className="text-main" /> Cursos
+                      <RiStackFill className="text-main" /> Cursos
                     </span>
-                    </Link>
+                  </Link>
                 </li>
                 <li>
-                <Link to='examen'
+                  <Link
+                    to="examen"
                     className="w-full flex items-center justify-between py-2 px-4 rounded-lg hover:bg-secondary-900 transition-colors"
-                >
+                  >
                     <span className="flex items-center gap-4">
-                    <RiStackFill className="text-main" /> Examenes
+                      <RiStackFill className="text-main" /> Examenes
                     </span>
-                </Link>
+                  </Link>
                 </li>
-                </>
+              </>
             )}
           </ul>
         </div>
         <nav>
           <Link
-            to={''}
+            to={""}
             onClick={() => {
               if (auth.idRol == 99) {
-                void cerrarSession()
+                void cerrarSession();
               } else {
-                void cerrarSessionProfesor()
+                void cerrarSessionProfesor();
               }
             }}
             className="flex items-center gap-4 py-2 px-4 rounded-lg hover:bg-main_2-100 text-main transition-colors hover:text-main"
@@ -249,14 +261,14 @@ const SideBar = (): JSX.Element => {
       </div>
       <button
         onClick={() => {
-          setShowMenu(!showMenu)
+          setShowMenu(!showMenu);
         }}
         className="xl:hidden fixed bottom-4 right-4 bg-main text-white p-3 rounded-full z-50"
       >
         {showMenu ? <RiCloseLine /> : <RiMenu3Line />}
       </button>
     </>
-  )
-}
+  );
+};
 
-export default SideBar
+export default SideBar;

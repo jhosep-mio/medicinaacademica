@@ -52,6 +52,8 @@ import { CrearExamenProfesor } from '../components/private/tables/examenes/Crear
 import { EditarExamenProfesor } from '../components/private/tables/examenes/EditarExamenProfesor'
 import { ListaReseneas } from '../components/private/tables/productos/ListaReseneas'
 import { ListaArchivosProfesor } from '../components/private/tables/productostoprofesro/archivos/ListaArchivosProfesor'
+import { AgregarCupon } from '../components/private/tables/cupones/AgregarCupon'
+import { ListaCupones } from '../components/private/tables/cupones/ListarCupones'
 
 export const Routing = (): JSX.Element => {
   return (
@@ -133,6 +135,10 @@ export const Routing = (): JSX.Element => {
             <Route path="examenes" element={<ListadoExamenes />} />
             <Route path="examenes/agregar" element={<CrearExamen />} />
             <Route path="examenes/editar/:id" element={<EditarExamen />} />
+
+            {/* CUPONEs */}
+            <Route path='cupones' element={<ListaCupones/>}/>
+            <Route path='cupones/agregar' element={<AgregarCupon/>}/>
 
             <Route path="examen" element={<ListadoExamenesProfesor />} />
             <Route path="examen/agregar" element={<CrearExamenProfesor />} />

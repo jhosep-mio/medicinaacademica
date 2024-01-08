@@ -12,14 +12,12 @@ import { Errors } from '../../../shared/Errors'
 import { ImageUploader } from '../../../shared/ImageUploader'
 import {
   type ImagenState,
-  serviciosValuesModificate,
+  type serviciosValuesModificate
 } from '../../../shared/Interfaces'
 import { SchemaServicios } from '../../../shared/Schemas'
 import Editor from '../../../shared/Editar'
 
-
 export const AgregarServicios = (): JSX.Element => {
-
   const navigate = useNavigate()
   const [content, setContent] = useState('')
   const [seccion1, setSeccion1] = useState('')
@@ -27,9 +25,7 @@ export const AgregarServicios = (): JSX.Element => {
   const [seccion3, setSeccion3] = useState('')
   const [seccion4, setSeccion4] = useState('')
 
-
   const { setTitle, loadingComponents, setLoadingComponents } = useAuth()
-
 
   const [imagen1, setImagen1] = useState<ImagenState>({
     archivo: null,
@@ -38,16 +34,12 @@ export const AgregarServicios = (): JSX.Element => {
   const [boton1, setBoton1] = useState(false)
   const [url1, setUrl1] = useState('')
 
-
   const [imagen2, setImagen2] = useState<ImagenState>({
     archivo: null,
     archivoName: ''
   })
   const [boton2, setBoton2] = useState(false)
   const [url2, setUrl2] = useState('')
-
-
-
 
   useEffect(() => {
     setTitle('Agregar servicios')
@@ -56,73 +48,69 @@ export const AgregarServicios = (): JSX.Element => {
   const saveCategoria = async (
     values: serviciosValuesModificate
   ): Promise<void> => {
-      setLoadingComponents(true)
-      const token = localStorage.getItem('token')
-      const data = new FormData()
-      data.append('nombre', values.nombre)
-    
-      if (imagen1.archivo != null) {
-        data.append('imagen1', imagen1.archivo)
-      }
+    setLoadingComponents(true)
+    const token = localStorage.getItem('token')
+    const data = new FormData()
+    data.append('nombre', values.nombre)
 
-      if (imagen2.archivo != null) {
-        data.append('imagen2', imagen2.archivo)
-      }
+    if (imagen1.archivo != null) {
+      data.append('imagen1', imagen1.archivo)
+    }
 
-      data.append('caracteristicas', content)
-      data.append('titulo1', values.titulo1)
-      data.append('seccion1', seccion1)
-      data.append('seccion2', seccion2)
-      data.append('seccion3', seccion3)
-      data.append('seccion4', seccion4)
+    if (imagen2.archivo != null) {
+      data.append('imagen2', imagen2.archivo)
+    }
 
+    data.append('caracteristicas', content)
+    data.append('titulo1', values.titulo1)
+    data.append('seccion1', seccion1)
+    data.append('seccion2', seccion2)
+    data.append('seccion3', seccion3)
+    data.append('seccion4', seccion4)
 
-      try {
-        const respuesta = await axios.post(`${Global.url}/saveServicio`, data, {
-          headers: {
-            Authorization: `Bearer ${
+    try {
+      const respuesta = await axios.post(`${Global.url}/saveServicio`, data, {
+        headers: {
+          Authorization: `Bearer ${
               token !== null && token !== '' ? token : ''
             }`
-          }
-        })
-
-        if (respuesta.data.status == 'success') {
-          Swal.fire('Agregado correctamente', '', 'success')
-          navigate('/admin/servicios')
-        } else {
-          Swal.fire('Error ', '', 'error')
         }
-      } catch (error) {
-        console.log(error)
-        Swal.fire('Error', '', 'error')
+      })
+
+      if (respuesta.data.status == 'success') {
+        Swal.fire('Agregado correctamente', '', 'success')
+        navigate('/admin/servicios')
+      } else {
+        Swal.fire('Error ', '', 'error')
       }
-      setLoadingComponents(false) 
-    
+    } catch (error) {
+      console.log(error)
+      Swal.fire('Error', '', 'error')
+    }
+    setLoadingComponents(false)
   }
-
-
 
   const { handleSubmit, handleChange, errors, values, touched, handleBlur, isSubmitting } =
     useFormik({
       initialValues: {
         nombre: '',
-        titulo1: ''
+        titulo1: '',
+        titulo2: '',
+        contenido2: ''
       },
       validationSchema: SchemaServicios,
       onSubmit: saveCategoria
     })
 
-    useEffect(() => {
-      if (errors && isSubmitting) {
-        const firstErrorKey = Object.keys(errors)[0]
-        const firstErrorElement = document.getElementsByName(firstErrorKey)[0]
-        if (firstErrorElement) {
-          firstErrorElement.focus()
-        }
+  useEffect(() => {
+    if (errors && isSubmitting) {
+      const firstErrorKey = Object.keys(errors)[0]
+      const firstErrorElement = document.getElementsByName(firstErrorKey)[0]
+      if (firstErrorElement) {
+        firstErrorElement.focus()
       }
-    }, [touched, errors, isSubmitting])
-
-
+    }
+  }, [touched, errors, isSubmitting])
 
   return (
     <>
@@ -147,9 +135,9 @@ export const AgregarServicios = (): JSX.Element => {
               />
               <Errors errors={errors.nombre} touched={touched.nombre} />
             </div>
-                    
+
           </div>
-          
+
           <div className="flex flex-col md:flex-row md:items-center gap-y-2 mb-10 relative">
             <p className="bg-secondary-100 pt-0 pb-0 lg:pl-2  mr-0 mb-0 font-medium text-white text-md lg:absolute py-2 rounded-md top-[-10px]">
               Imagen del servicio<span className="text-red-500">*</span>
@@ -172,7 +160,7 @@ export const AgregarServicios = (): JSX.Element => {
                 setImagen={setImagen2}
                 clase="2"
               />
-              
+
             </div>
           </div>
 
