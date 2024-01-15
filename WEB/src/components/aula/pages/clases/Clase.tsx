@@ -305,7 +305,6 @@ export const Clase = (): JSX.Element => {
           navigate(`/mis_cursos/curso/${cursoId ?? ''}`)
           return
         }
-
         // Si tiene acceso, continuar con la carga de otros datos
         if (mounted) {
           await getOneData()
@@ -351,7 +350,6 @@ export const Clase = (): JSX.Element => {
       const nuevoProgreso = { ...prevProgreso }
       nuevoProgreso[cursoId ?? ''] = nuevoProgreso[cursoId ?? ''] || {}
       nuevoProgreso[cursoId ?? ''][claseId ?? ''] = true
-
       const actualizarProgreso = async (): Promise<void> => {
         const data = new FormData()
         data.append('progreso', JSON.stringify(nuevoProgreso))
@@ -395,6 +393,28 @@ export const Clase = (): JSX.Element => {
     }
   }
 
+  useEffect(() => {
+    if (!loading) {
+      contenidos.forEach((bloque) => {
+        bloque.contenido.forEach((_conte: any, index: any) => {
+          if (
+            bloque.codClases &&
+                  Array.isArray(bloque.codClases) &&
+                  bloque.codClases.length > index &&
+                  bloque.codClases[index] === claseId
+          ) {
+            const yaCompletada = progresoClases[cursoId ?? '']?.[claseId ?? '']
+            if (!yaCompletada) {
+              if (bloque.linkClases[index] === 'notiene') {
+                actualizarProgresoClase(cursoId, claseId)
+              }
+            }
+          }
+        })
+      })
+    }
+  }, [contenidos, claseId, cursoId, loading])
+
   return (
     <>
       {loading && <Loading />}
@@ -432,6 +452,9 @@ export const Clase = (): JSX.Element => {
                                 setPlayer={setPlayer}
                                 videoId={bloque.linkClases[index]}
                                 onVideoProgress={handleVideoProgress}
+                                actualizarProgresoClase={actualizarProgresoClase}
+                                cursoId={cursoId}
+                                claseId={claseId}
                               />
                             </div>
                           )
@@ -482,27 +505,45 @@ export const Clase = (): JSX.Element => {
                                     ? 'border-gray-400 bg-gray-400 cursor-default opacity-60'
                                     : 'border-secondary-50 bg-transparent hover:bg-secondary-50 transition-colors '
                                 }`}
-                            onClick={() => {
-                              const currentIndex =
-                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                // @ts-expect-error
-                                contenidos[0].codClases.findIndex((contenido) =>
-                                  contenido.includes(claseId ?? '')
-                                )
-                              // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-                              const prevIndex = currentIndex - 1
-                              if (prevIndex >= 0) {
-                                const prevClassId =
-                                  contenidos[0].codClases[prevIndex]
-                                navigate(
-                                  `/mis_cursos/curso/clase/${
-                                    cursoId ?? ''
-                                  }/tema/${prevClassId ?? ''}`
-                                )
-                                setOpen(false)
-                                setOpenApunte(false)
-                              }
-                            }}
+                                onClick={() => {
+                                  if (progresoClases[cursoId ?? '']?.[claseId ?? '']) {
+                                    const currentSectionIndex = contenidos.findIndex(
+                                      (seccion) =>
+                                        seccion.codClases.includes(claseId ?? '')
+                                    )
+                                    if (currentSectionIndex !== -1) {
+                                      const currentSection = contenidos[currentSectionIndex]
+                                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                      // @ts-expect-error
+                                      const currentIndexInSection = currentSection.codClases.findIndex(
+                                        (contenido: any) =>
+                                          contenido.includes(claseId ?? '')
+                                      )
+                                      const previousSectionIndex =
+                                                currentIndexInSection === 0
+                                                  ? currentSectionIndex - 1
+                                                  : currentSectionIndex
+                                      const previousClassIndex =
+                                                currentIndexInSection === 0
+                                                  ? contenidos[previousSectionIndex].codClases.length - 1
+                                                  : currentIndexInSection - 1
+
+                                      const previousClassId =
+                                                contenidos[previousSectionIndex]?.codClases[previousClassIndex]
+
+                                      if (previousClassId) {
+                                        navigate(
+                                                    `/mis_cursos/curso/clase/${
+                                                        cursoId ?? ''
+                                                    }/tema/${previousClassId ?? ''}`
+                                        )
+                                        setOpen(false)
+                                        setOpenApunte(false)
+                                      }
+                                    }
+                                  }
+                                }}
+
                           >
                             <GiNextButton className="text-3xl" />
                           </button>
@@ -513,30 +554,40 @@ export const Clase = (): JSX.Element => {
                                 : 'border-gray-400 bg-gray-400 cursor-default opacity-60'
                             }`}
                             onClick={() => {
-                              if (
-                                progresoClases[cursoId ?? '']?.[claseId ?? '']
-                              ) {
-                                const currentIndex =
+                              if (progresoClases[cursoId ?? '']?.[claseId ?? '']) {
+                                const currentSectionIndex = contenidos.findIndex(
+                                  (seccion) =>
+                                    seccion.codClases.includes(claseId ?? '')
+                                )
+                                if (currentSectionIndex !== -1) {
+                                  const currentSection = contenidos[currentSectionIndex]
+                                  const currentIndexInSection =
                                   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                                   // @ts-expect-error
-                                  contenidos[0].codClases.findIndex(
-                                    (contenido: any) =>
-                                      contenido.includes(claseId ?? '')
-                                  )
-                                // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-                                const nextIndex = currentIndex + 1
-                                const lastLength =
-                                  contenidos[0].codClases.length
-                                if (nextIndex < lastLength) {
+                                            currentSection.codClases.findIndex(
+                                              (contenido: any) =>
+                                                contenido.includes(claseId ?? '')
+                                            )
+                                  const nextSectionIndex =
+                                            currentIndexInSection === currentSection.codClases.length - 1
+                                              ? currentSectionIndex + 1
+                                              : currentSectionIndex
+
+                                  const nextClassIndex = currentIndexInSection === currentSection.codClases.length - 1
+                                    ? 0 // Ir a la primera clase de la siguiente sección
+                                    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                                    : currentIndexInSection + 1 // Permanecer en la sección actual
                                   const nextClassId =
-                                    contenidos[0].codClases[nextIndex]
-                                  navigate(
-                                    `/mis_cursos/curso/clase/${
-                                      cursoId ?? ''
-                                    }/tema/${nextClassId ?? ''}`
-                                  )
-                                  setOpen(false)
-                                  setOpenApunte(false)
+                                            contenidos[nextSectionIndex]?.codClases[nextClassIndex]
+                                  if (nextClassId) {
+                                    navigate(
+                                                `/mis_cursos/curso/clase/${
+                                                    cursoId ?? ''
+                                                }/tema/${nextClassId ?? ''}`
+                                    )
+                                    setOpen(false)
+                                    setOpenApunte(false)
+                                  }
                                 }
                               }
                             }}
@@ -697,78 +748,109 @@ export const Clase = (): JSX.Element => {
                       </div>
                     </div>
                     {contenidos[0] && (
-                      <div className="flex h-full items-center gap-4">
-                        <button
-                          className={`h-full flex items-center border px-6 p-4 rounded-xl rotate-180
-                            ${
-                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                              // @ts-expect-error
-                              contenidos[0].codClases.findIndex((contenido) =>
-                                contenido.includes(claseId ?? '')
-                              ) == 0
-                                ? 'border-gray-400 bg-gray-400 cursor-default opacity-60'
-                                : 'border-secondary-50 bg-transparent hover:bg-secondary-50 transition-colors '
-                            }`}
-                          onClick={() => {
-                            const currentIndex =
-                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                              // @ts-expect-error
-                              contenidos[0].codClases.findIndex((contenido) =>
-                                contenido.includes(claseId ?? '')
-                              )
-                            // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-                            const prevIndex = currentIndex - 1
-                            if (prevIndex >= 0) {
-                              const prevClassId =
-                                contenidos[0].codClases[prevIndex]
-                              navigate(
-                                `/mis_cursos/curso/clase/${
-                                  cursoId ?? ''
-                                }/tema/${prevClassId ?? ''}`
-                              )
-                              setOpen(false)
-                              setOpenApunte(false)
-                            }
-                          }}
-                        >
-                          <GiNextButton className="text-3xl" />
-                        </button>
-                        <button
-                          className={`h-full flex items-center border  px-6 p-4 rounded-xl ${
-                            progresoClases[cursoId ?? '']?.[claseId ?? '']
-                              ? 'border-secondary-50 bg-transparent hover:bg-secondary-50 transition-colors'
-                              : 'border-gray-400 bg-gray-400 cursor-default opacity-60'
-                          }`}
-                          onClick={() => {
-                            if (
+                        <div className="flex h-full items-center gap-4">
+                          <button
+                            className={`h-full flex items-center border px-6 p-4 rounded-xl rotate-180
+                                ${
+                                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                    // @ts-expect-error
+                                    contenidos[0].codClases.findIndex(
+                                    (contenido: any) =>
+                                      contenido.includes(claseId ?? '')
+                                  ) == 0
+                                    ? 'border-gray-400 bg-gray-400 cursor-default opacity-60'
+                                    : 'border-secondary-50 bg-transparent hover:bg-secondary-50 transition-colors '
+                                }`}
+                                onClick={() => {
+                                  if (progresoClases[cursoId ?? '']?.[claseId ?? '']) {
+                                    const currentSectionIndex = contenidos.findIndex(
+                                      (seccion) =>
+                                        seccion.codClases.includes(claseId ?? '')
+                                    )
+                                    if (currentSectionIndex !== -1) {
+                                      const currentSection = contenidos[currentSectionIndex]
+                                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                      // @ts-expect-error
+                                      const currentIndexInSection = currentSection.codClases.findIndex(
+                                        (contenido: any) =>
+                                          contenido.includes(claseId ?? '')
+                                      )
+                                      const previousSectionIndex =
+                                                currentIndexInSection === 0
+                                                  ? currentSectionIndex - 1
+                                                  : currentSectionIndex
+                                      const previousClassIndex =
+                                                currentIndexInSection === 0
+                                                  ? contenidos[previousSectionIndex].codClases.length - 1
+                                                  : currentIndexInSection - 1
+
+                                      const previousClassId =
+                                                contenidos[previousSectionIndex]?.codClases[previousClassIndex]
+
+                                      if (previousClassId) {
+                                        navigate(
+                                                    `/mis_cursos/curso/clase/${
+                                                        cursoId ?? ''
+                                                    }/tema/${previousClassId ?? ''}`
+                                        )
+                                        setOpen(false)
+                                        setOpenApunte(false)
+                                      }
+                                    }
+                                  }
+                                }}
+
+                          >
+                            <GiNextButton className="text-3xl" />
+                          </button>
+                          <button
+                            className={`h-full flex items-center border  px-6 p-4 rounded-xl ${
                               progresoClases[cursoId ?? '']?.[claseId ?? '']
-                            ) {
-                              const currentIndex =
-                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                // @ts-expect-error
-                                contenidos[0].codClases.findIndex((contenido) =>
-                                  contenido.includes(claseId ?? '')
+                                ? 'border-secondary-50 bg-transparent hover:bg-secondary-50 transition-colors'
+                                : 'border-gray-400 bg-gray-400 cursor-default opacity-60'
+                            }`}
+                            onClick={() => {
+                              if (progresoClases[cursoId ?? '']?.[claseId ?? '']) {
+                                const currentSectionIndex = contenidos.findIndex(
+                                  (seccion) =>
+                                    seccion.codClases.includes(claseId ?? '')
                                 )
-                              // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-                              const nextIndex = currentIndex + 1
-                              const lastLength = contenidos[0].codClases.length
-                              if (nextIndex < lastLength) {
-                                const nextClassId =
-                                  contenidos[0].codClases[nextIndex]
-                                navigate(
-                                  `/mis_cursos/curso/clase/${
-                                    cursoId ?? ''
-                                  }/tema/${nextClassId ?? ''}`
-                                )
-                                setOpen(false)
-                                setOpenApunte(false)
+                                if (currentSectionIndex !== -1) {
+                                  const currentSection = contenidos[currentSectionIndex]
+                                  const currentIndexInSection =
+                                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                  // @ts-expect-error
+                                            currentSection.codClases.findIndex(
+                                              (contenido: any) =>
+                                                contenido.includes(claseId ?? '')
+                                            )
+                                  const nextSectionIndex =
+                                            currentIndexInSection === currentSection.codClases.length - 1
+                                              ? currentSectionIndex + 1
+                                              : currentSectionIndex
+
+                                  const nextClassIndex = currentIndexInSection === currentSection.codClases.length - 1
+                                    ? 0 // Ir a la primera clase de la siguiente sección
+                                    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                                    : currentIndexInSection + 1 // Permanecer en la sección actual
+                                  const nextClassId =
+                                            contenidos[nextSectionIndex]?.codClases[nextClassIndex]
+                                  if (nextClassId) {
+                                    navigate(
+                                                `/mis_cursos/curso/clase/${
+                                                    cursoId ?? ''
+                                                }/tema/${nextClassId ?? ''}`
+                                    )
+                                    setOpen(false)
+                                    setOpenApunte(false)
+                                  }
+                                }
                               }
-                            }
-                          }}
-                        >
-                          <GiNextButton className="text-3xl" />
-                        </button>
-                      </div>
+                            }}
+                          >
+                            <GiNextButton className="text-3xl" />
+                          </button>
+                        </div>
                     )}
                   </div>
                   <div className="flex flex-col lg:flew-row gap-4 lg:gap-10  mt-10 mb-10">
@@ -833,7 +915,7 @@ export const Clase = (): JSX.Element => {
                         }
                       >
                         Tiempo estimado:{' '}
-                        <span className="text-secondary-70 text-3xl -mt-1">
+                        <span className="text-secondary-70  text-3xl -mt-1">
                           {contenidos.map((bloque) =>
                             bloque.contenido.map(
                               (_conte: any, index: number) => {
@@ -875,7 +957,7 @@ export const Clase = (): JSX.Element => {
                                 dangerouslySetInnerHTML={{
                                   __html: bloque.linkClases[index]
                                 }}
-                                className="w-full text-2xl limpiar_estilos"
+                                className="w-full text-2xl limpiar_estilos forzar_color"
                               />
                             )
                           } else {
@@ -943,79 +1025,109 @@ export const Clase = (): JSX.Element => {
                       </div>
                     </div>
                     {contenidos[0] && (
-                      <div className="flex h-full items-center gap-4">
-                        <button
-                          className={`h-full flex items-center border px-6 p-4 rounded-xl rotate-180
+                        <div className="flex h-full items-center gap-4">
+                          <button
+                            className={`h-full flex items-center border px-6 p-4 rounded-xl rotate-180
                                 ${
-                                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                  // @ts-expect-error
-                                  contenidos[0].codClases.findIndex(
+                                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                    // @ts-expect-error
+                                    contenidos[0].codClases.findIndex(
                                     (contenido: any) =>
                                       contenido.includes(claseId ?? '')
                                   ) == 0
                                     ? 'border-gray-400 bg-gray-400 cursor-default opacity-60'
                                     : 'border-secondary-50 bg-transparent hover:bg-secondary-50 transition-colors '
                                 }`}
-                          onClick={() => {
-                            const currentIndex =
-                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                              // @ts-expect-error
-                              contenidos[0].codClases.findIndex((contenido) =>
-                                contenido.includes(claseId ?? '')
-                              )
-                            // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-                            const prevIndex = currentIndex - 1
-                            if (prevIndex >= 0) {
-                              const prevClassId =
-                                contenidos[0].codClases[prevIndex]
-                              navigate(
-                                `/mis_cursos/curso/clase/${
-                                  cursoId ?? ''
-                                }/tema/${prevClassId ?? ''}`
-                              )
-                              setOpen(false)
-                              setOpenApunte(false)
-                            }
-                          }}
-                        >
-                          <GiNextButton className="text-3xl" />
-                        </button>
-                        <button
-                          className={`h-full flex items-center border  px-6 p-4 rounded-xl ${
-                            progresoClases[cursoId ?? '']?.[claseId ?? '']
-                              ? 'border-secondary-50 bg-transparent hover:bg-secondary-50 transition-colors'
-                              : 'border-gray-400 bg-gray-400 cursor-default opacity-60'
-                          }`}
-                          onClick={() => {
-                            if (
+                                onClick={() => {
+                                  if (progresoClases[cursoId ?? '']?.[claseId ?? '']) {
+                                    const currentSectionIndex = contenidos.findIndex(
+                                      (seccion) =>
+                                        seccion.codClases.includes(claseId ?? '')
+                                    )
+                                    if (currentSectionIndex !== -1) {
+                                      const currentSection = contenidos[currentSectionIndex]
+                                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                      // @ts-expect-error
+                                      const currentIndexInSection = currentSection.codClases.findIndex(
+                                        (contenido: any) =>
+                                          contenido.includes(claseId ?? '')
+                                      )
+                                      const previousSectionIndex =
+                                                currentIndexInSection === 0
+                                                  ? currentSectionIndex - 1
+                                                  : currentSectionIndex
+                                      const previousClassIndex =
+                                                currentIndexInSection === 0
+                                                  ? contenidos[previousSectionIndex].codClases.length - 1
+                                                  : currentIndexInSection - 1
+
+                                      const previousClassId =
+                                                contenidos[previousSectionIndex]?.codClases[previousClassIndex]
+
+                                      if (previousClassId) {
+                                        navigate(
+                                                    `/mis_cursos/curso/clase/${
+                                                        cursoId ?? ''
+                                                    }/tema/${previousClassId ?? ''}`
+                                        )
+                                        setOpen(false)
+                                        setOpenApunte(false)
+                                      }
+                                    }
+                                  }
+                                }}
+
+                          >
+                            <GiNextButton className="text-3xl" />
+                          </button>
+                          <button
+                            className={`h-full flex items-center border  px-6 p-4 rounded-xl ${
                               progresoClases[cursoId ?? '']?.[claseId ?? '']
-                            ) {
-                              const currentIndex =
-                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                // @ts-expect-error
-                                contenidos[0].codClases.findIndex((contenido) =>
-                                  contenido.includes(claseId ?? '')
+                                ? 'border-secondary-50 bg-transparent hover:bg-secondary-50 transition-colors'
+                                : 'border-gray-400 bg-gray-400 cursor-default opacity-60'
+                            }`}
+                            onClick={() => {
+                              if (progresoClases[cursoId ?? '']?.[claseId ?? '']) {
+                                const currentSectionIndex = contenidos.findIndex(
+                                  (seccion) =>
+                                    seccion.codClases.includes(claseId ?? '')
                                 )
-                              // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-                              const nextIndex = currentIndex + 1
-                              const lastLength = contenidos[0].codClases.length
-                              if (nextIndex < lastLength) {
-                                const nextClassId =
-                                  contenidos[0].codClases[nextIndex]
-                                navigate(
-                                  `/mis_cursos/curso/clase/${
-                                    cursoId ?? ''
-                                  }/tema/${nextClassId ?? ''}`
-                                )
-                                setOpen(false)
-                                setOpenApunte(false)
+                                if (currentSectionIndex !== -1) {
+                                  const currentSection = contenidos[currentSectionIndex]
+                                  const currentIndexInSection =
+                                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                  // @ts-expect-error
+                                            currentSection.codClases.findIndex(
+                                              (contenido: any) =>
+                                                contenido.includes(claseId ?? '')
+                                            )
+                                  const nextSectionIndex =
+                                            currentIndexInSection === currentSection.codClases.length - 1
+                                              ? currentSectionIndex + 1
+                                              : currentSectionIndex
+
+                                  const nextClassIndex = currentIndexInSection === currentSection.codClases.length - 1
+                                    ? 0 // Ir a la primera clase de la siguiente sección
+                                    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+                                    : currentIndexInSection + 1 // Permanecer en la sección actual
+                                  const nextClassId =
+                                            contenidos[nextSectionIndex]?.codClases[nextClassIndex]
+                                  if (nextClassId) {
+                                    navigate(
+                                                `/mis_cursos/curso/clase/${
+                                                    cursoId ?? ''
+                                                }/tema/${nextClassId ?? ''}`
+                                    )
+                                    setOpen(false)
+                                    setOpenApunte(false)
+                                  }
+                                }
                               }
-                            }
-                          }}
-                        >
-                          <GiNextButton className="text-3xl" />
-                        </button>
-                      </div>
+                            }}
+                          >
+                            <GiNextButton className="text-3xl" />
+                          </button>
+                        </div>
                     )}
                   </div>
                   <Examen

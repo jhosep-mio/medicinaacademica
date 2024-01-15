@@ -68,7 +68,7 @@ export const Secciones = ({ secciones, claseId, tokenUser, setLoadingDescarga, l
                           dangerouslySetInnerHTML={{
                             __html: archivo.contenido
                           }}
-                          className="w-full text-2xl text-gray-400"
+                          className="w-full text-2xl text-gray-400 forzar_color"
                         />
                       </div>
                     </div>

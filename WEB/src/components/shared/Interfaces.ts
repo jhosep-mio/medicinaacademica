@@ -371,7 +371,6 @@ export interface valuesTransaccion {
   factura: string
 }
 
-// PRODUCTOS
 export interface productosValues {
   id: number
   nombre: string
@@ -394,6 +393,43 @@ export interface productosValues {
   imagen2: string
   imagen3: string
   pdf: string
+  created_at: string | null
+  updated_at: string | null
+}
+
+// PRODUCTOS
+export interface productosValuesToCupon {
+  id: number
+  nombre: string
+  id_categoria: string
+  id_profesor: string
+  resumen: string
+  categoria: string
+  profesor: string
+  nivel: string
+  duracionFiltro: string
+  duracion: string
+  inscritos: string
+  certificado: string
+  caracteristicas: string
+  contenido: string
+  precio1: number
+  precio2: number
+  imagen1: string
+  enlaceVideo: string
+  tiempointroduccion: string
+  videointroduccion: string
+  nombreintroduccion: string
+  imagen2: string
+  imagen3: string
+  pdf: string
+  modalidad: string
+  fechaInicio: string
+  talleresVivo: string
+  articulos: string
+  recursos2: string
+  garantia: string
+  acceso: string
   created_at: string | null
   updated_at: string | null
 }

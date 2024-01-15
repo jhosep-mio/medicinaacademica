@@ -32,6 +32,7 @@ export const Empresa = ({
   const [habilitarCel, setHabilitarCel] = useState(false)
   const tokenUser = localStorage.getItem('tokenUser')
   const [cursos, setCursos] = useState([])
+  const currentDomain = window.location.origin
 
   const validarCursosComprados = (cursosCarrito: carrito[]): string[] => {
     const cursosYaComprados = cursosCarrito
@@ -143,12 +144,12 @@ export const Empresa = ({
           address: {
             street_name: values.email,
             street_number: 123,
-            zip_code: '06233200'
+            zip_code: 'notiene'
           }
         },
         back_urls: {
-          success: `http://localhost:5173/success/${String(uniqueId)}`,
-          failure: 'http://localhost:5173/error-pago'
+          success: `${currentDomain}/success/${String(uniqueId)}`,
+          failure: `${currentDomain}/error-pago`
         },
         metadata: {
           comment: uniqueId
@@ -165,7 +166,7 @@ export const Empresa = ({
         {
           headers: {
             Authorization:
-              'Bearer APP_USR-8504267146898040-112212-f81bad1dd8eb16d7609c60c35c376f91-1561392704',
+              `Bearer ${Global.privatemercadopago}`,
             'Content-Type': 'application/json'
           }
         }

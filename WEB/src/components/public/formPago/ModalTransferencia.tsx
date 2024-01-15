@@ -111,6 +111,7 @@ export const ModalTransferencia = ({
         Swal.fire('Error al enviar comprobante', '', 'warning')
       }
     } catch (error) {
+      console.log(error)
       Swal.fire('Error al enviar comprobante', '', 'error')
     }
     setCargando(false)

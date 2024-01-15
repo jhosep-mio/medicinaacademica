@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import { Autoplay } from 'swiper'
+import { Autoplay, Pagination } from 'swiper'
 import 'swiper/css'
 import 'swiper/css/effect-fade'
 import 'swiper/css/grid'
@@ -102,7 +102,6 @@ const ViewServicio = (): JSX.Element => {
       `${Global.url}/testimoniosFrom/${id ?? ''}`
     )
     setTestimonios(request.data)
-    console.log(request.data)
   }
 
   useEffect(() => {
@@ -254,12 +253,15 @@ const ViewServicio = (): JSX.Element => {
               slidesPerView={3}
               loop={true}
               spaceBetween={30}
-              modules={[Autoplay]}
+              modules={[Autoplay, Pagination]}
               autoplay={{
                 delay: 3000,
                 disableOnInteraction: false
               }}
-              className="swp_testimonios"
+              pagination={{
+                dynamicBullets: true
+              }}
+              className="swp_testimonios py-10"
               breakpoints={{
                 0: {
                   slidesPerView: 1,

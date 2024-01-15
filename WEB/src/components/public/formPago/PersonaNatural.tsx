@@ -36,10 +36,13 @@ export const PersonaNatural = ({
   const tokenUser = localStorage.getItem('tokenUser')
   const [cursos, setCursos] = useState([])
   const [habilitarCel, setHabilitarCel] = useState(false)
+  const currentDomain = window.location.origin
+
   const handleClickPagar = async (): Promise<void> => {
     setLoadingCorreo(true)
     setDatos(values)
     const uniqueId = uuidv4()
+    // Calcular la parte proporcional del descuento por producto
     try {
       const preferenceData = {
         items: cart.map((producto) => ({
@@ -51,6 +54,7 @@ export const PersonaNatural = ({
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           picture_url: `${Global.urlImages}/productos/${producto.imagen1}`
         })),
+        total: 400,
         payment_methods: {
           installments: 1,
           excluded_payment_types: [
@@ -74,12 +78,12 @@ export const PersonaNatural = ({
           address: {
             street_name: values.email,
             street_number: 123,
-            zip_code: '06233200'
+            zip_code: 'notiene'
           }
         },
         back_urls: {
-          success: `http://localhost:5173/success/${String(uniqueId)}`,
-          failure: 'http://localhost:5173/error-pago'
+          success: `${currentDomain}/success/${String(uniqueId)}`,
+          failure: `${currentDomain}/error-pago`
         },
         metadata: {
           comment: uniqueId
@@ -96,12 +100,11 @@ export const PersonaNatural = ({
         {
           headers: {
             Authorization:
-              'Bearer APP_USR-8504267146898040-112212-f81bad1dd8eb16d7609c60c35c376f91-1561392704',
+              `Bearer ${Global.privatemercadopago}`,
             'Content-Type': 'application/json'
           }
         }
       )
-
       const preferenceId: string = response.data.id
       setPreferenceId(preferenceId)
       const dataArray = []

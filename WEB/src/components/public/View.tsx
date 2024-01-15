@@ -11,8 +11,9 @@ import {
   PiGraduationCapLight,
   PiCertificateLight,
   PiLockOpenThin
+  , PiArticleLight
 } from 'react-icons/pi'
-import { Autoplay } from 'swiper'
+import { Autoplay, Pagination } from 'swiper'
 import { styled } from '@mui/material/styles'
 import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp'
 import MuiAccordion, { type AccordionProps } from '@mui/material/Accordion'
@@ -23,17 +24,17 @@ import MuiAccordionDetails from '@mui/material/AccordionDetails'
 import Typography from '@mui/material/Typography'
 import Rating from '@mui/material/Rating'
 
-import { CiLock } from 'react-icons/ci'
+import { CiLock, CiCalendar } from 'react-icons/ci'
 import {
+  type productosValuesToCupon,
   type comentariosValues,
-  type productosValues,
   type profesorValues,
   type testimoniosValues
 } from '../shared/Interfaces'
 import axios from 'axios'
 import { Global } from '../../helper/Global'
 import Loading from '../shared/Loading'
-
+import { MdOutlineComputer, MdTimeline } from 'react-icons/md'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/css'
 import 'swiper/css/effect-fade'
@@ -45,6 +46,9 @@ import { ModalPago } from '../shared/modals/ModalPago'
 import { ModalVideoYOu } from '../shared/modals/ModalVideoYOu'
 import { defaultperfil } from '../shared/images'
 import { ModalVideoYOu2 } from '../shared/modals/ModalVideoYOu2'
+
+import { LiaSitemapSolid } from 'react-icons/lia'
+import { IoShieldCheckmarkOutline } from 'react-icons/io5'
 
 const Accordion = styled((props: AccordionProps) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -93,7 +97,7 @@ const View = (): JSX.Element => {
 
   const { id } = useParams()
   const [loadingComponents, setLoadingComponents] = useState(true)
-  const [producto, setProducto] = useState<productosValues | null>(null)
+  const [producto, setProducto] = useState<productosValuesToCupon | null>(null)
   const [materiales, setMateriales] = useState<string[]>([])
   const [requisitos, setRequisitos] = useState<string[]>([])
   const [openVideo, setOpenVideo] = useState(false)
@@ -111,10 +115,13 @@ const View = (): JSX.Element => {
 
   const getOneData = async (): Promise<void> => {
     const request = await axios.get(`${Global.url}/oneProducto/${id ?? ''}`)
-    const responseData: productosValues = request.data[0] // Replace "YourResponseType" with the actual type of the response data
+    const responseData: productosValuesToCupon = request.data[0] // Replace "YourResponseType" with the actual type of the response data
     setProducto(responseData)
     if (request.data[0].comentariosfinales) {
-      setComentarios(request.data[0].comentariosfinales ? JSON.parse(request.data[0].comentariosfinales) : []
+      setComentarios(
+        request.data[0].comentariosfinales
+          ? JSON.parse(request.data[0].comentariosfinales)
+          : []
       )
     }
 
@@ -132,21 +139,29 @@ const View = (): JSX.Element => {
       setProfesor(request2.data[0])
     }
 
-    if (request.data[0].comentariosfinales && JSON.parse(request.data[0].comentariosfinales).length > 0) {
-      const comentarios: comentariosValues[] = JSON.parse(request.data[0].comentariosfinales)
+    if (
+      request.data[0].comentariosfinales &&
+      JSON.parse(request.data[0].comentariosfinales).length > 0
+    ) {
+      const comentarios: comentariosValues[] = JSON.parse(
+        request.data[0].comentariosfinales
+      )
       const sumaClases = comentarios.reduce((acumulador, comentario) => {
         const valorClase = Number(comentario.clase)
         if (!isNaN(valorClase)) {
           return acumulador + valorClase
         } else {
-          console.warn(`Valor de clase no válido en el comentario con ID ${comentario.id}. Se omitirá en el cálculo.`)
+          console.warn(
+            `Valor de clase no válido en el comentario con ID ${comentario.id}. Se omitirá en el cálculo.`
+          )
           return acumulador
         }
       }, 0)
-      const mediaClase = comentarios.length > 0 ? sumaClases / comentarios.length : 0
+      const mediaClase =
+        comentarios.length > 0 ? sumaClases / comentarios.length : 0
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error
-      setMedia((mediaClase).toFixed(1))
+      setMedia(mediaClase.toFixed(1))
     }
     setLoadingComponents(false)
   }
@@ -214,17 +229,6 @@ const View = (): JSX.Element => {
     getOneData()
   }, [])
 
-  //   useEffect(() => {
-  //     const iframeContainer = document.getElementById('iframeContainer')
-  //     const handleContainerClick = (): void => {
-  //       openModal()
-  //     }
-  //     iframeContainer.addEventListener('click', handleContainerClick)
-  //     return () => {
-  //       iframeContainer.removeEventListener('click', handleContainerClick)
-  //     }
-  //   }, [])
-
   return (
     <>
       {loadingComponents && <Loading />}
@@ -252,11 +256,11 @@ const View = (): JSX.Element => {
                   ></div>
                 </p>
                 <Rating
-                    name="read-only"
-                    className="text-4xl"
-                    value={!loadingComponents ? media : 0}
-                    precision={0.5}
-                    readOnly
+                  name="read-only"
+                  className="text-4xl"
+                  value={!loadingComponents ? media : 0}
+                  precision={0.5}
+                  readOnly
                 />
                 <p className="create">
                   Creado por: <a href="#profesor">{producto.profesor}</a>
@@ -265,19 +269,22 @@ const View = (): JSX.Element => {
                   Fecha de última actualización:{' '}
                   {formatearFecha(producto.updated_at)}
                 </p>
-                {// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-expect-error
-                producto.temario &&
+                {
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-expect-error
+                  producto.temario && (
                     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                    <a href="#" className="temario" onClick={
-                        async () => {
-                          await descargarArchivo(
-                          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                            // @ts-expect-error
-                            producto.temario)
-                        }}>
-                    Descargar temario
+                    <a
+                      href="#"
+                      className="temario"
+                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                      // @ts-expect-error
+                      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                      onClick={async () => { await descargarArchivo(producto.temario) }}
+                    >
+                      Descargar temario
                     </a>
+                  )
                 }
               </div>
 
@@ -285,19 +292,25 @@ const View = (): JSX.Element => {
                 <div className={'cardView'}>
                   {producto.enlaceVideo
                     ? (
-                      <div className='relative w-full h-[220px] ' id='iframeContainer' >
-                            <iframe
-                                src={producto.enlaceVideo}
-                                title="YouTube video player"
-                                frameBorder="0"
-                                className='absolute w-full h-full inset-0'
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                allowFullScreen
-                            />
-                            <div className='w-full h-full absolute inset-0 bg-black/10' onClick={() => { setModalIsOpen(true) }}>
-
-                            </div>
-                      </div>
+                    <div
+                      className="relative w-full h-[220px] "
+                      id="iframeContainer"
+                    >
+                      <iframe
+                        src={producto.enlaceVideo}
+                        title="YouTube video player"
+                        frameBorder="0"
+                        className="absolute w-full h-full inset-0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                      />
+                      <div
+                        className="w-full h-full absolute inset-0 bg-black/10"
+                        onClick={() => {
+                          setModalIsOpen(true)
+                        }}
+                      ></div>
+                    </div>
                       )
                     : (
                     <img
@@ -372,11 +385,8 @@ const View = (): JSX.Element => {
                               (i: string, itemIndex: number) => (
                                 <>
                                   {itemIndex == 0 &&
-                                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                    // @ts-expect-error
+
                                     producto.nombreintroduccion &&
-                                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                    // @ts-expect-error
                                     producto.videointroduccion && (
                                       <li
                                         key={itemIndex}
@@ -389,8 +399,6 @@ const View = (): JSX.Element => {
                                           <p>
                                             <BsYoutube />
                                             {
-                                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                              // @ts-expect-error
                                               producto.nombreintroduccion
                                             }
                                           </p>
@@ -398,11 +406,7 @@ const View = (): JSX.Element => {
                                         <div className="itemsCurso__time">
                                           <span className="ml-2 text-gray-500">
                                             {
-                                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                              // @ts-expect-error
                                               producto.tiempointroduccion
-                                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                              // @ts-expect-error
                                                 ? producto.tiempointroduccion
                                                 : ''
                                             }
@@ -420,7 +424,9 @@ const View = (): JSX.Element => {
                                     </div>
                                     <div className="itemsCurso__time">
                                       <span className="ml-2 text-gray-500">
-                                        {conte.tiemposClase?.[itemIndex] != 0 ? conte.tiemposClase?.[itemIndex] : ''}
+                                        {conte.tiemposClase?.[itemIndex] != 0
+                                          ? conte.tiemposClase?.[itemIndex]
+                                          : ''}
                                       </span>
                                       <CiLock />
                                     </div>
@@ -436,13 +442,16 @@ const View = (): JSX.Element => {
                 </div>
               </div>
 
-              <div className="curso__content__contenido hidden md:block" id="profesor">
+              <div
+                className="curso__content__contenido hidden md:block"
+                id="profesor"
+              >
                 <div className="cardProfesor">
                   <div className="cardProfesor__img">
                     <img
                       src={`${Global.urlImages}/fotoperfil/${profesor.imagen1}`}
                       alt=""
-                      className='w-[100px] h-[100px] object-cover object-top'
+                      className="w-[100px] h-[100px] object-cover object-top"
                     />
 
                     <h5>{profesor.nombre}</h5>
@@ -458,7 +467,10 @@ const View = (): JSX.Element => {
                 </div>
               </div>
 
-              <section className="resenas hidden" style={{ padding: '0' }}>
+              <section
+                className="resenas hidden md:block"
+                style={{ padding: '0' }}
+              >
                 <div className="resenas__title" style={{ padding: '40px 0' }}>
                   <h2>Reseñas del curso</h2>
                 </div>
@@ -467,8 +479,11 @@ const View = (): JSX.Element => {
                     slidesPerView={2}
                     loop={true}
                     spaceBetween={30}
-                    className="swp_testimonios"
-                    modules={[Autoplay]}
+                    pagination={{
+                      dynamicBullets: true
+                    }}
+                    className="swp_testimonios py-10"
+                    modules={[Autoplay, Pagination]}
                     autoplay={{
                       delay: 2500
                     }}
@@ -490,11 +505,10 @@ const View = (): JSX.Element => {
                     }}
                   >
                     {testimonios.length > 0 &&
-                      (
-                        testimonios.map(
-                          (testimonio: testimoniosValues, index: number) =>
-                            testimonio.tipoComentario == 'Facebook'
-                              ? (
+                      testimonios.map(
+                        (testimonio: testimoniosValues, index: number) =>
+                          testimonio.tipoComentario == 'Facebook'
+                            ? (
                             <div
                               key={index}
                               className="cardResenas2"
@@ -502,8 +516,8 @@ const View = (): JSX.Element => {
                                 __html: testimonio.comentario
                               }}
                             ></div>
-                                )
-                              : (
+                              )
+                            : (
                             <SwiperSlide key={testimonio.id}>
                               <div className="cardResenas">
                                 <div className="cardResenas__img">
@@ -527,51 +541,48 @@ const View = (): JSX.Element => {
                                 </span>
                               </div>
                             </SwiperSlide>
-                                )
-                        )
-                      )
-                    }
-                    {
-                     comentarios?.map((comentario, indexcoment: number) => (
-                        <SwiperSlide key={indexcoment}>
+                              )
+                      )}
+                    {comentarios?.map((comentario, indexcoment: number) => (
+                      <SwiperSlide key={indexcoment}>
                         <div className="cardResenas">
                           <div className="cardResenas__img">
                             <img
                               src={
                                 comentario.foto
                                   ? `${Global.urlImages}/fotoperfil/${
-                                        comentario.foto ?? ''
+                                      comentario.foto ?? ''
                                     }`
                                   : defaultperfil
-                                }
+                              }
                               alt=""
                             />
                             <h5>{comentario.user}</h5>
-                            <div className='mx-auto w-full flex justify-center cardResenas__img__span'>
-                                <Rating
-                                    name="read-only"
-                                    className="text-5xl text-center pb-4"
-                                    value={Number(comentario.clase)}
-                                    precision={0.5}
-                                    readOnly
-                                />
+                            <div className="mx-auto w-full flex justify-center cardResenas__img__span">
+                              <Rating
+                                name="read-only"
+                                className="text-5xl text-center pb-4"
+                                value={Number(comentario.clase)}
+                                precision={0.5}
+                                readOnly
+                              />
                             </div>
                           </div>
                           <div className="cardResenas__content">
-                            <p className="text-[1.4rem] break-words">{comentario.texto}</p>
+                            <p className="text-[1.4rem] break-words">
+                              {comentario.texto}
+                            </p>
                           </div>
 
-                          <span className='cardResenas__span'>
+                          <span className="cardResenas__span">
                             <BsChatText />
                           </span>
                         </div>
                       </SwiperSlide>
-                     ))
-                    }
+                    ))}
                   </Swiper>
                 </div>
               </section>
-
             </div>
 
             <div className="curso__items">
@@ -618,6 +629,72 @@ const View = (): JSX.Element => {
                       <p>{producto.certificado}</p>
                     </span>
                   </li>
+                  {producto.modalidad && (
+                    <li>
+                      <span>
+                        <MdOutlineComputer />
+                        <p>Modalidad</p>
+                      </span>
+                      <span>
+                        <p>{producto.modalidad}</p>
+                      </span>
+                    </li>
+                  )}
+                  {producto.fechaInicio && (
+                    <li>
+                      <span>
+                        <CiCalendar />
+                        <p>Fecha de Inicio</p>
+                      </span>
+                      <span>
+                        <p>{producto.fechaInicio}</p>
+                      </span>
+                    </li>
+                  )}
+                  {producto.articulos && (
+                    <li>
+                      <span>
+                        <PiArticleLight />
+                        <p>Artículos</p>
+                      </span>
+                      <span>
+                        <p>{producto.articulos}</p>
+                      </span>
+                    </li>
+                  )}
+                  {producto.recursos2 && (
+                    <li>
+                      <span>
+                        <LiaSitemapSolid />
+                        <p>Recursos descargables</p>
+                      </span>
+                      <span>
+                        <p>{producto.recursos2}</p>
+                      </span>
+                    </li>
+                  )}
+                  {producto.garantia && (
+                    <li>
+                      <span>
+                        <IoShieldCheckmarkOutline />
+                        <p>Garantía</p>
+                      </span>
+                      <span>
+                        <p>{producto.garantia}</p>
+                      </span>
+                    </li>
+                  )}
+                  {producto.acceso && (
+                    <li>
+                      <span>
+                        <MdTimeline />
+                        <p>Acceso</p>
+                      </span>
+                      <span>
+                        <p>{producto.acceso}</p>
+                      </span>
+                    </li>
+                  )}
                 </ul>
               </div>
 
@@ -648,252 +725,238 @@ const View = (): JSX.Element => {
             </div>
 
             <div className="curso__content__contenido md:hidden">
-                <div className="curso__content__contenido__title">
-                  <h5>Contenido del curso</h5>
-                </div>
-                <div className="curso__content__contenido__items">
-                  <div>
-                    {contenidos.map((conte: any, index: number) => (
-                      <Accordion
-                        key={index}
-                        expanded={expanded === `panel${index}`}
-                        onChange={handleChange(`panel${index}`)}
+              <div className="curso__content__contenido__title">
+                <h5>Contenido del curso</h5>
+              </div>
+              <div className="curso__content__contenido__items">
+                <div>
+                  {contenidos.map((conte: any, index: number) => (
+                    <Accordion
+                      key={index}
+                      expanded={expanded === `panel${index}`}
+                      onChange={handleChange(`panel${index}`)}
+                    >
+                      <AccordionSummary
+                        aria-controls={`panel${index}d-content`}
+                        id={`panel${index}d-header`}
                       >
-                        <AccordionSummary
-                          aria-controls={`panel${index}d-content`}
-                          id={`panel${index}d-header`}
-                        >
-                          <Typography>{conte.titulo}</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                          <ul className="itemsCurso">
-                            {conte.contenido.map(
-                              (i: string, itemIndex: number) => (
-                                <>
-                                  {itemIndex == 0 &&
-                                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                    // @ts-expect-error
-                                    producto.nombreintroduccion &&
-                                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                    // @ts-expect-error
-                                    producto.videointroduccion && (
-                                      <li
-                                        key={itemIndex}
-                                        onClick={() => {
-                                          setOpenVideo(true)
-                                        }}
-                                        className="cursor-pointer hover:bg-gray-200 transition-colors py-1"
-                                      >
-                                        <div className="itemsCurso__name">
-                                          <p>
-                                            <BsYoutube />
-                                            {
-                                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                              // @ts-expect-error
-                                              producto.nombreintroduccion
-                                            }
-                                          </p>
-                                        </div>
-                                        <div className="itemsCurso__time">
-                                          <span className="ml-2 text-gray-500">
-                                            {
-                                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                              // @ts-expect-error
-                                              producto.tiempointroduccion
-                                              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                              // @ts-expect-error
-                                                ? producto.tiempointroduccion
-                                                : ''
-                                            }
-                                          </span>
-                                          <PiLockOpenThin />
-                                        </div>
-                                      </li>
-                                  )}
-                                  <li key={itemIndex}>
-                                    <div className="itemsCurso__name">
-                                      <p>
-                                        <BsYoutube />
-                                        {i}
-                                      </p>
-                                    </div>
-                                    <div className="itemsCurso__time">
-                                      <span className="ml-2 text-gray-500">
-                                        {conte.tiemposClase?.[itemIndex] != 0 ? conte.tiemposClase?.[itemIndex] : ''}
-                                      </span>
-                                      <CiLock />
-                                    </div>
-                                  </li>
-                                </>
-                              )
-                            )}
-                          </ul>
-                        </AccordionDetails>
-                      </Accordion>
-                    ))}
-                  </div>
+                        <Typography>{conte.titulo}</Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <ul className="itemsCurso">
+                          {conte.contenido.map(
+                            (i: string, itemIndex: number) => (
+                              <>
+                                {itemIndex == 0 &&
+
+                                  producto.nombreintroduccion &&
+
+                                  producto.videointroduccion && (
+                                    <li
+                                      key={itemIndex}
+                                      onClick={() => {
+                                        setOpenVideo(true)
+                                      }}
+                                      className="cursor-pointer hover:bg-gray-200 transition-colors py-1"
+                                    >
+                                      <div className="itemsCurso__name">
+                                        <p>
+                                          <BsYoutube />
+                                          {
+                                            producto.nombreintroduccion
+                                          }
+                                        </p>
+                                      </div>
+                                      <div className="itemsCurso__time">
+                                        <span className="ml-2 text-gray-500">
+                                          {
+                                            producto.tiempointroduccion
+                                              ? producto.tiempointroduccion
+                                              : ''
+                                          }
+                                        </span>
+                                        <PiLockOpenThin />
+                                      </div>
+                                    </li>
+                                )}
+                                <li key={itemIndex}>
+                                  <div className="itemsCurso__name">
+                                    <p>
+                                      <BsYoutube />
+                                      {i}
+                                    </p>
+                                  </div>
+                                  <div className="itemsCurso__time">
+                                    <span className="ml-2 text-gray-500">
+                                      {conte.tiemposClase?.[itemIndex] != 0
+                                        ? conte.tiemposClase?.[itemIndex]
+                                        : ''}
+                                    </span>
+                                    <CiLock />
+                                  </div>
+                                </li>
+                              </>
+                            )
+                          )}
+                        </ul>
+                      </AccordionDetails>
+                    </Accordion>
+                  ))}
                 </div>
               </div>
+            </div>
 
-              <div className="curso__content__contenido md:hidden" id="profesor">
-                <div className="cardProfesor">
-                  <div className="cardProfesor__img">
-                    <img
-                      src={`${Global.urlImages}/fotoperfil/${profesor.imagen1}`}
-                      alt=""
-                      className='w-[100px] h-[100px] object-cover object-top'
-                    />
+            <div className="curso__content__contenido md:hidden" id="profesor">
+              <div className="cardProfesor">
+                <div className="cardProfesor__img">
+                  <img
+                    src={`${Global.urlImages}/fotoperfil/${profesor.imagen1}`}
+                    alt=""
+                    className="w-[100px] h-[100px] object-cover object-top"
+                  />
 
-                    <h5>{profesor.nombre}</h5>
-                  </div>
-                  <div className="cardProfesor__descripcion">
-                    <div
-                      className=""
-                      dangerouslySetInnerHTML={{
-                        __html: profesor.caracteristicas
-                      }}
-                    ></div>
-                  </div>
+                  <h5>{profesor.nombre}</h5>
+                </div>
+                <div className="cardProfesor__descripcion">
+                  <div
+                    className=""
+                    dangerouslySetInnerHTML={{
+                      __html: profesor.caracteristicas
+                    }}
+                  ></div>
                 </div>
               </div>
+            </div>
 
-              <section className="resenas md:hidden" style={{ padding: '0' }}>
-                <div className="resenas__title" style={{ padding: '40px 0' }}>
-                  <h2>Reseñas del curso</h2>
-                </div>
-                <div className="resenas__main">
-                  <Swiper
-                    slidesPerView={2}
-                    loop={true}
-                    spaceBetween={30}
-                    className="swp_testimonios"
-                    modules={[Autoplay]}
-                    autoplay={{
-                      delay: 2500
-                    }}
-                    breakpoints={{
-                      0: {
-                        slidesPerView: 1,
-                        spaceBetween: 20
-                      },
-                      640: {
-                        slidesPerView: 1,
-                        spaceBetween: 20
-                      },
-                      768: {
-                        slidesPerView: 2
-                      },
-                      1024: {
-                        slidesPerView: 2
-                      }
-                    }}
-                  >
-                    {testimonios.length > 0 &&
-                      (
-                        testimonios.map(
-                          (testimonio: testimoniosValues, index: number) =>
-                            testimonio.tipoComentario == 'Facebook'
-                              ? (
-                            <div
-                              key={index}
-                              className="cardResenas2"
-                              dangerouslySetInnerHTML={{
-                                __html: testimonio.comentario
-                              }}
-                            ></div>
-                                )
-                              : (
-                            <SwiperSlide key={testimonio.id}>
-                              <div className="cardResenas">
-                                <div className="cardResenas__img">
-                                  <img
-                                    src={`${Global.urlImages}/testimonios/${testimonio.imagen1}`}
-                                    alt=""
-                                  />
-                                  <h5>{testimonio.nombre}</h5>
-                                </div>
-                                <div className="cardResenas__content">
-                                  <div
-                                    className=""
-                                    dangerouslySetInnerHTML={{
-                                      __html: testimonio.caracteristicas
-                                    }}
-                                  ></div>
-                                </div>
-
-                                <span>
-                                  <BsChatText />
-                                </span>
-                              </div>
-                            </SwiperSlide>
-                                )
-                        )
-                      )
+            <section className="resenas md:hidden" style={{ padding: '0' }}>
+              <div className="resenas__title" style={{ padding: '40px 0' }}>
+                <h2>Reseñas del curso</h2>
+              </div>
+              <div className="resenas__main">
+                <Swiper
+                  slidesPerView={2}
+                  loop={true}
+                  spaceBetween={30}
+                  className="swp_testimonios"
+                  modules={[Autoplay]}
+                  autoplay={{
+                    delay: 2500
+                  }}
+                  breakpoints={{
+                    0: {
+                      slidesPerView: 1,
+                      spaceBetween: 20
+                    },
+                    640: {
+                      slidesPerView: 1,
+                      spaceBetween: 20
+                    },
+                    768: {
+                      slidesPerView: 2
+                    },
+                    1024: {
+                      slidesPerView: 2
                     }
-                    {
-                     comentarios?.map((comentario, indexcoment: number) => (
-                        <SwiperSlide key={indexcoment}>
-                        <div className="cardResenas">
-                          <div className="cardResenas__img">
-                            <img
-                              src={
-                                comentario.foto
-                                  ? `${Global.urlImages}/fotoperfil/${
-                                        comentario.foto ?? ''
-                                    }`
-                                  : defaultperfil
-                                }
-                              alt=""
-                            />
-                            <h5>{comentario.user}</h5>
-                            <div className='mx-auto w-full flex justify-center cardResenas__img__span'>
-                                <Rating
-                                    name="read-only"
-                                    className="text-5xl text-center pb-4"
-                                    value={Number(comentario.clase)}
-                                    precision={0.5}
-                                    readOnly
+                  }}
+                >
+                  {testimonios.length > 0 &&
+                    testimonios.map(
+                      (testimonio: testimoniosValues, index: number) =>
+                        testimonio.tipoComentario == 'Facebook'
+                          ? <div
+                            key={index}
+                            className="cardResenas2"
+                            dangerouslySetInnerHTML={{
+                              __html: testimonio.comentario
+                            }}
+                          ></div>
+                          : (
+                          <SwiperSlide key={testimonio.id}>
+                            <div className="cardResenas">
+                              <div className="cardResenas__img">
+                                <img
+                                  src={`${Global.urlImages}/testimonios/${testimonio.imagen1}`}
+                                  alt=""
                                 />
+                                <h5>{testimonio.nombre}</h5>
+                              </div>
+                              <div className="cardResenas__content">
+                                <div
+                                  className=""
+                                  dangerouslySetInnerHTML={{
+                                    __html: testimonio.caracteristicas
+                                  }}
+                                ></div>
+                              </div>
+
+                              <span>
+                                <BsChatText />
+                              </span>
                             </div>
+                          </SwiperSlide>
+                            )
+                    )}
+                  {comentarios?.map((comentario, indexcoment: number) => (
+                    <SwiperSlide key={indexcoment}>
+                      <div className="cardResenas">
+                        <div className="cardResenas__img">
+                          <img
+                            src={
+                              comentario.foto
+                                ? `${Global.urlImages}/fotoperfil/${
+                                    comentario.foto ?? ''
+                                  }`
+                                : defaultperfil
+                            }
+                            alt=""
+                          />
+                          <h5>{comentario.user}</h5>
+                          <div className="mx-auto w-full flex justify-center cardResenas__img__span">
+                            <Rating
+                              name="read-only"
+                              className="text-5xl text-center pb-4"
+                              value={Number(comentario.clase)}
+                              precision={0.5}
+                              readOnly
+                            />
                           </div>
-                          <div className="cardResenas__content">
-                            <p className="text-[1.4rem] break-words">{comentario.texto}</p>
-                          </div>
-
-                          <span className='cardResenas__span'>
-                            <BsChatText />
-                          </span>
                         </div>
-                      </SwiperSlide>
-                     ))
-                    }
-                  </Swiper>
-                </div>
-              </section>
+                        <div className="cardResenas__content">
+                          <p className="text-[1.4rem] break-words">
+                            {comentario.texto}
+                          </p>
+                        </div>
 
+                        <span className="cardResenas__span">
+                          <BsChatText />
+                        </span>
+                      </div>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              </div>
+            </section>
           </div>
           {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-expect-error
             producto.videointroduccion != null && producto.videointroduccion
-              ? <ModalVideoYOu
+              ? (
+              <ModalVideoYOu
                 open={openVideo}
                 setOpen={setOpenVideo}
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-expect-error
                 video={producto.videointroduccion}
               />
+                )
               : null
           }
-          {
-            producto.enlaceVideo != null && producto.enlaceVideo
-              ? <ModalVideoYOu2
-                open={modalIsOpen}
-                setOpen={setModalIsOpen}
-                video={producto.enlaceVideo}
-              />
-              : null
-          }
+          {producto.enlaceVideo != null && producto.enlaceVideo
+            ? (
+            <ModalVideoYOu2
+              open={modalIsOpen}
+              setOpen={setModalIsOpen}
+              video={producto.enlaceVideo}
+            />
+              )
+            : null}
         </>
       )}
       <ModalPago

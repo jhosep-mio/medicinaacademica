@@ -7,9 +7,23 @@ interface values {
   player: string | null
   setPlayer: Dispatch<SetStateAction<string | null>>
   onVideoProgress: (progress: number, formattedTime: string) => void
+  actualizarProgresoClase: (
+    cursoId: string | undefined,
+    claseId: string | undefined
+  ) => void
+  cursoId: string | undefined
+  claseId: string | undefined
 }
 
-export const YoutubeVideo = ({ videoId, onVideoProgress, player, setPlayer }: values): JSX.Element => {
+export const YoutubeVideo = ({
+  videoId,
+  onVideoProgress,
+  player,
+  setPlayer,
+  actualizarProgresoClase,
+  cursoId,
+  claseId
+}: values): JSX.Element => {
   const onReady = (event: any): void => {
     // Acceso al reproductor en el objeto event
     setPlayer(event.target)
@@ -29,6 +43,28 @@ export const YoutubeVideo = ({ videoId, onVideoProgress, player, setPlayer }: va
       disablekb: 0 // Desactivar controles del teclado
     }
   }
+
+  const isValidYouTubeVideo = async (videoId: string): Promise<boolean> => {
+    try {
+      const response = await fetch(
+        `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}`
+      )
+      return response.ok
+    } catch (error) {
+      console.error('Error al verificar el video:', error)
+      return false
+    }
+  }
+  // Uso en useEffect
+  useEffect(() => {
+    const checkVideoValidity = async (): Promise<void> => {
+      const isValidVideo = await isValidYouTubeVideo(videoId)
+      if (!isValidVideo) {
+        actualizarProgresoClase(cursoId, claseId)
+      }
+    }
+    checkVideoValidity()
+  }, [videoId])
 
   useEffect(() => {
     if (player) {
@@ -50,5 +86,12 @@ export const YoutubeVideo = ({ videoId, onVideoProgress, player, setPlayer }: va
     }
   }, [player, onVideoProgress])
 
-  return <YouTube videoId={videoId} opts={opts} onReady={onReady} className='w-full h-full'/>
+  return (
+    <YouTube
+      videoId={videoId}
+      opts={opts}
+      onReady={onReady}
+      className="w-full h-full"
+    />
+  )
 }

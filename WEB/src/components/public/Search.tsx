@@ -50,7 +50,6 @@ const Search = (): JSX.Element => {
                         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                         // @ts-expect-error
                         const mediaClase = (JSON.parse(producto.comentariosfinales)).reduce((acumulador: number, comentario: any) => acumulador + Number(comentario.clase), 0) / JSON.parse(producto.comentariosfinales).length
-                        console.log(mediaClase)
                         return (
                         <Stack spacing={1} className="estrellas2">
                             <Rating name="size-large" defaultValue={mediaClase} size="large" readOnly />

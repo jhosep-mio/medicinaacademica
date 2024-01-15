@@ -1,5 +1,5 @@
 import { Swiper, SwiperSlide } from 'swiper/react'
-import { Autoplay } from 'swiper'
+import { Autoplay, Pagination } from 'swiper'
 import 'swiper/css'
 import 'swiper/css/effect-fade'
 import 'swiper/css/grid'
@@ -166,9 +166,12 @@ const Home = (): JSX.Element => {
             slidesPerView={4}
             loop={true}
             spaceBetween={30}
-            className="swp_testimonios"
+            pagination={{
+              dynamicBullets: true
+            }}
+            className="swp_testimonios py-10"
             draggable={false}
-            modules={[Autoplay]}
+            modules={[Autoplay, Pagination]}
             autoplay={{
               delay: 3000,
               disableOnInteraction: false
